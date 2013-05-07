@@ -1,0 +1,72 @@
+# OSX #
+#######
+
+# Source: https://github.com/github/gitignore/blob/master/Global/OSX.gitignore
+
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+
+# Thumbnails
+._*
+
+# Files that might appear on external disk
+.Spotlight-V100
+.Trashes
+
+
+# IntelliJ #
+############
+
+# Source: https://github.com/github/gitignore/blob/master/Global/IntelliJ.gitignore
+
+*.iml
+*.ipr
+*.iws
+.idea/
+
+
+# SVN #
+#######
+
+# Source: https://github.com/github/gitignore/blob/master/Global/SVN.gitignore
+
+.svn/
+
+
+# Sublime Text 2 #
+##################
+
+# Source: https://github.com/github/gitignore/blob/master/Global/SublimeText.gitignore
+
+*.sublime-project
+*.sublime-workspace
+
+
+# node #
+########
+
+# Source: https://github.com/github/gitignore/blob/master/Node.gitignore
+
+lib-cov
+*.seed
+*.log
+*.csv
+*.dat
+*.out
+*.pid
+*.gz
+
+pids
+logs
+results
+
+npm-debug.log
+node_modules
+
+# Databases #
+#############
+
+*.sql
+*.sqlite
