@@ -68,5 +68,8 @@
     "passfail"      : false,
     "white"         : false,
 
-    "predef"        : [ ]
+    "predef"        : [
+        "describe", "it", "beforeEach",
+        "angular", "module", "inject"
+    ]
 }

@@ -6,7 +6,7 @@
     throw new Error("window.angular is not defined.");
   }
 
-  if (!hammer) {
+  if (!Hammer) {
     throw new Error("window.Hammer is not defined.");
   }
 
@@ -49,14 +49,14 @@
 
   var module = angular.module('hammer', []);
 
-  GESTURES.forEach(function (gesture, idx) {
+  GESTURES.forEach(function (gesture) {
     var hammerGesture = 'hammer' + gesture[0].toUpperCase() + gesture.slice(1);
 
     module.directive(hammerGesture, ['$parse', function ($parse) {
       return function (scope, element, attr) {
         var args = newScope.$eval(attr[hammerGesture]),
             tapHandler,
-            options,
+            options = null,
             instance;
 
         if (typeof args === 'undefined') {
@@ -67,7 +67,9 @@
           options = args;
         }
 
-        instance = hammer(element[0], options).on(gesture, function (e) {
+        instance = hammer(element[0], options);
+
+        instance.on(gesture, function (e) {
           scope.$apply(function () {
             tapHandler(scope, { $event: e });
           });
