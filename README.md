@@ -1,6 +1,8 @@
 # angular-hammer
 
-[Hammer.js](http://eightmedia.github.io/hammer.js/) adapter for [AngularJS](http://angularjs.org/). It gives a possibility to use directives which handle Hammer.js gestures.
+angular-hammer is a [Hammer.js](http://eightmedia.github.io/hammer.js/) adapter for [AngularJS](http://angularjs.org/). It gives a possibility to use directives which handle Hammer.js gestures.
+
+The directives are build in this way: `hammer-{hammer_gesture}`, for instance `hammer-tap`.
 
 ## Usage
 
