@@ -1,81 +1,114 @@
-;(function (__global, angular, hammer) {
+;(function (window, angular, Hammer) {
 
-  'use strict';
+'use strict';
 
-  if (!angular) {
-    throw new Error("window.angular is not defined.");
-  }
+if (!angular) {
+  throw new Error('`angular` is not defined.');
+}
 
-  if (!Hammer) {
-    throw new Error("window.Hammer is not defined.");
-  }
+if (!Hammer) {
+  throw new Error('`Hammer` is not defined.');
+}
 
-  var GESTURES = [
-    'hold',
-    'tap',
-    'doubletap',
-    'drag',
-    'dragstart',
-    'dragend',
-    'dragup',
-    'dragdown',
-    'dragleft',
-    'dragright',
-    'swipe',
-    'swipeup',
-    'swipedown',
-    'swipeleft',
-    'swiperight',
-    'transform',
-    'transformstart',
-    'transformend',
-    'rotate',
-    'pinch',
-    'pinchin',
-    'pinchout',
-    'touch',
-    'release'
-  ];
+/**
+ * Capitalizes string.
+ * @param  {String} str
+ * @return {String}
+ */
+function capitalize(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
 
-  // Create clean scope
+/**
+ * Converts directive name in HTML form to JS form.
+ * @param  {String} directive
+ * @return {String}
+ */
+function toJSDirective(directive, all) {
+  return directive.split('-').map(function (item, i) {
+    if (!all && i === 0) return item;
+    return capitalize(item);
+  }).join('');
+}
 
-  var newScope;
+/**
+ * List of all available recognizers defined by Hammer.
+ * @type {Array}
+ */
+var RECOGNIZERS = [
+  'pan',
+  'pan-o',
+  'pinch',
+  'pinch-o',
+  'press',
+  'rotate',
+  'rotate-o',
+  'swipe',
+  'tap'
+];
 
-  angular.injector(['ng']).invoke(['$rootScope', function($rootScope) {
-    newScope = $rootScope.$new();
-  }]);
+/**
+ * @const {String}
+ */
+var prefix = 'hm';
 
-  // Create module
+/**
+ * 'hammer' module.
+ * @type {Objecy}
+ */
+var module = angular.module('hammer', []);
 
-  var module = angular.module('hammer', []);
+function isOptimized(d) {
+  return d.charAt(d.length - 1) === 'O';
+}
 
-  GESTURES.forEach(function (gesture) {
-    var hammerGesture = 'hammer' + gesture[0].toUpperCase() + gesture.slice(1);
+function get$hammer(scope, element) {
+  return scope.$hammer || (scope.$hammer = new Hammer.Manager(element[0]));
+}
 
-    module.directive(hammerGesture, ['$parse', function ($parse) {
-      return function (scope, element, attr) {
-        var args = newScope.$eval(attr[hammerGesture]),
-            tapHandler,
-            options = null,
-            instance;
+function recognizerFromDirective(d, optimized) {
+  return d.slice(prefix.length, d.length - !!optimized);
+}
 
-        if (typeof args === 'undefined') {
-          tapHandler = $parse(attr[hammerGesture]);
-        } else {
-          tapHandler = $parse(args.fn);
-          delete args.fn;
-          options = args;
-        }
+function constructLinkFn($parse, directive) {
+  return function linkFn(scope, element, attr) {
+    var $hammer = get$hammer(scope, element);
+    var optimized = isOptimized(directive);
+    var recognizer = recognizerFromDirective(directive, optimized);
+    var eventName = recognizer.toLowerCase();
+    var callback = $parse(attr[directive]);
+    var eventCallback = angular.noop;
 
-        instance = hammer(element[0], options);
+    if (!Hammer[recognizer]) {
+      throw new Error('`' + recognizer + '` is not supported by Hammer.js.');
+    }
 
-        instance.on(gesture, function (e) {
-          scope.$apply(function () {
-            tapHandler(scope, { $event: e });
-          });
+    if (optimized) {
+      eventCallback = function eventCallbackOptimized(ev) {
+        callback(scope, { hmEvent: ev });
+      };
+    } else {
+      eventCallback = function eventCallbackNotOptimized(ev) {
+        scope.$apply(function () {
+          callback(scope, { hmEvent: ev });
         });
       };
-    }]);
-  });
+    }
+
+    $hammer.add(new Hammer[recognizer]());
+    $hammer.on(eventName, eventCallback);
+  };
+}
+
+RECOGNIZERS.forEach(function (recognizer) {
+  var directive = toJSDirective(prefix + '-' + recognizer);
+
+  module.directive(directive, ['$parse', function ($parse) {
+    return {
+      restrict: 'AC',
+      link: constructLinkFn($parse, directive)
+    };
+  }]);
+});
 
 }(window, window.angular, window.Hammer));
