@@ -2,13 +2,14 @@
 
 'use strict';
 
-if (!angular) {
-  throw new Error('`angular` is not defined.');
+function assert(cond, message) {
+  if (!cond) {
+    throw new Error(message);
+  }
 }
 
-if (!Hammer) {
-  throw new Error('`Hammer` is not defined.');
-}
+assert(angular, '`angular` is not defined.');
+assert(Hammer, '`Hammer` is not defined.');
 
 /**
  * Capitalizes string.
@@ -29,6 +30,47 @@ function toJSDirective(directive, all) {
     if (!all && i === 0) return item;
     return capitalize(item);
   }).join('');
+}
+
+/**
+ * Checks if a given directive is optimized.
+ * @param  {String}  d directive
+ * @return {Boolean}
+ */
+function isOptimized(d) {
+  return d.charAt(d.length - 1) === 'O';
+}
+
+/**
+ * Retrives or creates a `Hammer.Manager`.
+ * @param  {Object}      scope
+ * @param  {HTMLElement} element
+ * @return {Object}
+ */
+function hammerManagerFromScope(scope, element) {
+  return scope.$hammer || (scope.$hammer = new Hammer.Manager(element[0]));
+}
+
+/**
+ * Converts directive to Hammer.JS recognizer name.
+ * @param  {String} d          directive
+ * @return {String}
+ */
+function recognizerFromDirective(d) {
+  var optimized = isOptimized(d);
+  return d.slice(prefix.length, d.length - !!optimized);
+}
+
+/**
+ * Retrives options for a given directive (if exists).
+ * @param  {Object}  scope
+ * @param  {Object}  attr      directive's attributes
+ * @param  {String}  d
+ * @return {Object}
+ */
+function hammerOpts(scope, attr, d) {
+  var optsDirective = d + (isOptimized(d) ? 'pts' : 'Opts');
+  return scope.$eval(attr[optsDirective]) || {};
 }
 
 /**
@@ -53,64 +95,44 @@ var RECOGNIZERS = [
 var prefix = 'hm';
 
 /**
- * 'hammer' module.
- * @type {Objecy}
+ * @module hammer
+ * @type {Object}
  */
 var module = angular.module('hammer', []);
 
-function isOptimized(d) {
-  return d.charAt(d.length - 1) === 'O';
-}
-
-function get$hammer(scope, element) {
-  return scope.$hammer || (scope.$hammer = new Hammer.Manager(element[0]));
-}
-
-function recognizerFromDirective(d, optimized) {
-  return d.slice(prefix.length, d.length - !!optimized);
-}
-
-function hammerOpts(scope, attr, directive, optimized) {
-  var optsDirective = directive + (optimized ? 'pts' : 'Opts');
-  var rawOpts = scope.$eval(attr[optsDirective]);
-  return rawOpts || {};
-}
-
 function constructLinkFn($parse, directive) {
   return function linkFn(scope, element, attr) {
-    var $hammer = get$hammer(scope, element);
-    var optimized = isOptimized(directive);
-    var recognizer = recognizerFromDirective(directive, optimized);
-    var eventName = recognizer.toLowerCase();
     var callback = $parse(attr[directive]);
+    if (!callback) return;
+
+    var recognizer = recognizerFromDirective(directive);
+    assert(Hammer[recognizer], '`' + recognizer + '` is not supported by Hammer.js.');
+
+    var $hammer = hammerManagerFromScope(scope, element);
+    var eventName = recognizer.toLowerCase();
     var opts = angular.extend({ event: eventName }, hammerOpts(scope, attr, directive));
-    var eventCallback = angular.noop;
 
     console.log('[ linkFn ]', {
       directive: directive,
-      optimized: optimized,
+      optimized: isOptimized(directive),
       event: eventName,
       opts: opts
     });
 
-    if (!Hammer[recognizer]) {
-      throw new Error('`' + recognizer + '` is not supported by Hammer.js.');
-    }
-
-    if (optimized) {
-      eventCallback = function eventCallbackOptimized(ev) {
-        callback(scope, { hmEvent: ev });
-      };
-    } else {
-      eventCallback = function eventCallbackNotOptimized(ev) {
-        scope.$apply(function () {
-          callback(scope, { hmEvent: ev });
-        });
-      };
-    }
-
     $hammer.add(new Hammer[recognizer](opts));
-    $hammer.on(eventName, eventCallback);
+    $hammer.on(eventName, (function (optimized) {
+      if (optimized) {
+        return function eventCallbackOptimized(ev) {
+          callback(scope, { hmEvent: ev });
+        };
+      } else {
+        return function eventCallbackNotOptimized(ev) {
+          scope.$apply(function () {
+            callback(scope, { hmEvent: ev });
+          });
+        };
+      }
+    }(isOptimized(directive))));
   };
 }
 
