@@ -70,6 +70,12 @@ function recognizerFromDirective(d, optimized) {
   return d.slice(prefix.length, d.length - !!optimized);
 }
 
+function hammerOpts(scope, attr, directive, optimized) {
+  var optsDirective = directive + (optimized ? 'pts' : 'Opts');
+  var rawOpts = scope.$eval(attr[optsDirective]);
+  return rawOpts || {};
+}
+
 function constructLinkFn($parse, directive) {
   return function linkFn(scope, element, attr) {
     var $hammer = get$hammer(scope, element);
@@ -77,7 +83,15 @@ function constructLinkFn($parse, directive) {
     var recognizer = recognizerFromDirective(directive, optimized);
     var eventName = recognizer.toLowerCase();
     var callback = $parse(attr[directive]);
+    var opts = angular.extend({ event: eventName }, hammerOpts(scope, attr, directive));
     var eventCallback = angular.noop;
+
+    console.log('[ linkFn ]', {
+      directive: directive,
+      optimized: optimized,
+      event: eventName,
+      opts: opts
+    });
 
     if (!Hammer[recognizer]) {
       throw new Error('`' + recognizer + '` is not supported by Hammer.js.');
@@ -95,7 +109,7 @@ function constructLinkFn($parse, directive) {
       };
     }
 
-    $hammer.add(new Hammer[recognizer]());
+    $hammer.add(new Hammer[recognizer](opts));
     $hammer.on(eventName, eventCallback);
   };
 }
