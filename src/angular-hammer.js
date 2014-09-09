@@ -61,6 +61,10 @@ function recognizerFromDirective(d) {
   return d.slice(prefix.length, d.length - !!optimized);
 }
 
+function parseOptionsExpr(scope, expr) {
+  return scope.$eval(expr);
+}
+
 /**
  * Retrives options for a given directive (if exists).
  * @param  {Object}  scope
@@ -70,7 +74,17 @@ function recognizerFromDirective(d) {
  */
 function hammerOpts(scope, attr, d) {
   var optsDirective = d + (isOptimized(d) ? 'pts' : 'Opts');
-  return scope.$eval(attr[optsDirective]) || {};
+  return parseOptionsExpr(scope, attr[optsDirective]) || {};
+}
+
+function hasWithToken(expr) {
+  return expr.indexOf(' with ') > -1;
+}
+
+function splitExpr(expr) {
+  return expr.split(' with ').map(function (expr) {
+    return expr.trim();
+  });
 }
 
 /**
@@ -100,17 +114,43 @@ var prefix = 'hm';
  */
 var module = angular.module('hammer', []);
 
+function directiveCallback($parse, scope, attr, d) {
+  var splitAttr = [];
+
+  if (hasWithToken(attr[d])) {
+    splitAttr = splitExpr(attr[d]);
+    return $parse(splitAttr[0]);
+  } else {
+    return $parse(attr[d]);
+  }
+}
+
+function directiveOptions(scope, attr, d) {
+  var splitAttr = [];
+
+  if (hasWithToken(attr[d])) {
+    splitAttr = splitExpr(attr[d]);
+    return parseOptionsExpr(scope, splitAttr[1]);
+  } else {
+    return hammerOpts(scope, attr, d);
+  }
+}
+
 function constructLinkFn($parse, directive) {
   return function linkFn(scope, element, attr) {
-    var callback = $parse(attr[directive]);
-    if (!callback) return;
+    var callback = directiveCallback($parse, scope, attr, directive);
+    var opts = directiveOptions(scope, attr, directive);
+
+    if (!callback) {
+      console.warn('[ linkFn ] no callback for directive = `' + directive + '`');
+      return;
+    }
 
     var recognizer = recognizerFromDirective(directive);
     assert(Hammer[recognizer], '`' + recognizer + '` is not supported by Hammer.js.');
 
-    var $hammer = hammerManagerFromScope(scope, element);
     var eventName = recognizer.toLowerCase();
-    var opts = angular.extend({ event: eventName }, hammerOpts(scope, attr, directive));
+    opts = angular.extend(opts, { event: eventName });
 
     console.log('[ linkFn ]', {
       directive: directive,
@@ -119,6 +159,7 @@ function constructLinkFn($parse, directive) {
       opts: opts
     });
 
+    var $hammer = hammerManagerFromScope(scope, element);
     $hammer.add(new Hammer[recognizer](opts));
     $hammer.on(eventName, (function (optimized) {
       if (optimized) {

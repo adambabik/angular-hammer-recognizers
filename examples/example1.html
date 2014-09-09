@@ -6,7 +6,7 @@
 
   <script src="/bower_components/hammerjs/hammer.js"></script>
   <script src="/bower_components/angularjs/angular.js"></script>
-  <script src="/src/angular-hammer.js"></script>
+  <script src="/dist/angular-hammer.js"></script>
 
   <script>
     angular.module('myApp', ['hammer'])
@@ -34,7 +34,7 @@
 </head>
 <body>
   <div ng-controller="Main">
-    <div class="box" hm-tap="changeColor(hmEvent)" hm-tap-opts="{ taps: 2 }" hm-pan-o="changeColor(hmEvent)">Tap</div>
+    <div class="box" hm-tap="changeColor(hmEvent) with { taps: 2 }" hm-pan-o="changeColor(hmEvent)">Tap</div>
   </div>
 </body>
 </html>
