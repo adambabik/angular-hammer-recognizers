@@ -87,33 +87,6 @@ function splitExpr(expr) {
   });
 }
 
-/**
- * List of all available recognizers defined by Hammer.
- * @type {Array}
- */
-var RECOGNIZERS = [
-  'pan',
-  'pan-o',
-  'pinch',
-  'pinch-o',
-  'press',
-  'rotate',
-  'rotate-o',
-  'swipe',
-  'tap'
-];
-
-/**
- * @const {String}
- */
-var prefix = 'hm';
-
-/**
- * @module hammer
- * @type {Object}
- */
-var module = angular.module('hammer', []);
-
 function directiveCallback($parse, scope, attr, d) {
   var splitAttr = [];
 
@@ -176,6 +149,33 @@ function constructLinkFn($parse, directive) {
     }(isOptimized(directive))));
   };
 }
+
+/**
+ * @module hammer
+ * @type {Object}
+ */
+var module = angular.module('hammer', []);
+
+/**
+ * @const {String}
+ */
+var prefix = 'hm';
+
+/**
+ * List of all available recognizers defined by Hammer.
+ * @type {Array}
+ */
+var RECOGNIZERS = [
+  'pan',
+  'pan-o',
+  'pinch',
+  'pinch-o',
+  'press',
+  'rotate',
+  'rotate-o',
+  'swipe',
+  'tap'
+];
 
 RECOGNIZERS.forEach(function (recognizer) {
   var directive = toJSDirective(prefix + '-' + recognizer);

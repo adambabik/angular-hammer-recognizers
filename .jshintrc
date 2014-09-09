@@ -45,5 +45,5 @@
   "quotmark"      : false,
   "validthis"     : true,
 
-  "predef"        : ["it", "describe", "before", "after", "beforeEach", "afterEach"]
+  "predef"        : []
 }
