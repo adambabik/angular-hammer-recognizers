@@ -2,6 +2,8 @@
 
 'use strict';
 
+var DEBUG_LOGS = false;
+
 function assert(cond, message) {
   if (!cond) {
     throw new Error(message);
@@ -125,12 +127,14 @@ function constructLinkFn($parse, directive) {
     var eventName = recognizer.toLowerCase();
     opts = angular.extend(opts, { event: eventName });
 
-    console.log('[ linkFn ]', {
-      directive: directive,
-      optimized: isOptimized(directive),
-      event: eventName,
-      opts: opts
-    });
+    if (DEBUG_LOGS) {
+      console.log('[ linkFn ]', {
+        directive: directive,
+        optimized: isOptimized(directive),
+        event: eventName,
+        opts: opts
+      });
+    }
 
     var $hammer = hammerManagerFromScope(scope, element);
     $hammer.add(new Hammer[recognizer](opts));

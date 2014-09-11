@@ -50,7 +50,8 @@ gulp.task('serve', function() {
     server: {
       baseDir: '.',
       directory: true
-    }
+    },
+    open: false
   });
   gulp.watch([opts.scripts], ['dist']);
 });

@@ -17,7 +17,9 @@
     }
   ],
   "main": "dist/angular-hammer.js",
-  "scripts": {},
+  "scripts": {
+    "test": "./node_modules/karma/bin/karma start"
+  },
   "engines": {
     "node": ">= 0.10"
   },
@@ -35,6 +37,6 @@
     "gulp-uglify": "^1.0.1",
     "karma": "^0.12.23",
     "karma-chrome-launcher": "^0.1.4",
-    "karma-jasmine": "^0.1.5"
+    "karma-jasmine": "~0.2.0"
   }
 }
