@@ -50,7 +50,21 @@ function isOptimized(d) {
  * @return {Object}
  */
 function hammerManagerFromScope(scope, element) {
-  return scope.$hammer || (scope.$hammer = new Hammer.Manager(element[0]));
+  var managers = scope.$hammer || (scope.$hammer = []);
+  var found = null;
+
+  managers.forEach(function (m) {
+    if (!found && m.element === element) {
+      found = m;
+    }
+  });
+
+  if (!found) {
+    found = new Hammer.Manager(element);
+    managers.push(found);
+  }
+
+  return found;
 }
 
 /**
@@ -136,7 +150,7 @@ function constructLinkFn($parse, directive) {
       });
     }
 
-    var $hammer = hammerManagerFromScope(scope, element);
+    var $hammer = hammerManagerFromScope(scope, element[0]);
     $hammer.add(new Hammer[recognizer](opts));
     $hammer.on(eventName, (function (optimized) {
       if (optimized) {

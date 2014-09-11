@@ -4,6 +4,7 @@ var gulp = require('gulp');
 var concat = require('gulp-concat');
 var sourcemaps = require('gulp-sourcemaps');
 var uglify = require('gulp-uglify');
+var connect = require('gulp-connect');
 var browserSync = require('browser-sync');
 var reload = browserSync.reload;
 var reloadStream = reload.bind(browserSync, { stream: true });
@@ -54,4 +55,10 @@ gulp.task('serve', function() {
     open: false
   });
   gulp.watch([opts.scripts], ['dist']);
+});
+
+gulp.task('test-server', function() {
+  connect.server({
+  	port: 8085
+  });
 });

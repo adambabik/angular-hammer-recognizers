@@ -1,0 +1,51 @@
+<!doctype html>
+<html ng-app="myApp">
+<head>
+  <meta charset="utf-8">
+  <title>Angular.js Hammer Spec</title>
+
+  <script src="/bower_components/hammerjs/hammer.min.js"></script>
+  <script src="/bower_components/angularjs/angular.min.js"></script>
+  <script src="/dist/angular-hammer.min.js"></script>
+
+  <script>
+    angular.module('myApp', ['hammer'])
+      .controller('Main', ['$scope', function($scope) {
+        $scope.action = null;
+
+        ['tap-single', 'tap-double', 'pan'].forEach(function (action) {
+          var parts = action.split('-');
+          parts.push('action');
+
+          var actionMethod = parts.map(function (item, idx) {
+            return idx === 0 ? item : (item.charAt(0).toUpperCase() + item.slice(1));
+          }).join('');
+
+          $scope[actionMethod] = (function (a) {
+            return function () {
+              $scope.action = a;
+            };
+          }(action))
+        });
+      }]);
+  </script>
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+    }
+    .area {
+      width: 200px;
+      height: 200px;
+      background-color: gray;
+    }
+  </style>
+</head>
+<body ng-controller="Main">
+  <div>{{action}}</div>
+  <div class="area" id="tap-single" hm-tap="tapSingleAction(hmEvent)"></div>
+  <div class="area" id="tap-double" hm-tap="tapDoubleAction(hmEvent) with { taps: 2 }"></div>
+  <div class="area" id="pan" hm-pan="panAction(hmEvent)"></div>
+</body>
+</html>
