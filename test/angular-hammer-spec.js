@@ -33,8 +33,6 @@ describe('Spec Page', function() {
     actions().mouseDown(panEl).perform().then(function () {
       return actions().mouseMove(element(by.id('tap-double'))).perform();
     }).then(function () {
-      return actions().mouseMove(element(by.id('tap-double'))).perform();
-    }).then(function () {
       return actions().mouseUp().perform();
     }).then(function () {
       expect(el.getText()).toBe('pan');
