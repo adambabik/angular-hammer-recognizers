@@ -11,12 +11,12 @@ module.exports = function(config) {
   // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
   frameworks: ['jasmine'],
 
-
   // list of files / patterns to load in the browser
   files: [
     'bower_components/angularjs/angular.min.js',
     { pattern: 'bower_components/angularjs/angular.min.js.map', watched: false, included: false },
     'bower_components/angular-mocks/angular-mocks.js',
+    'src/browserTrigger.js',
     'bower_components/hammerjs/hammer.js',
     'dist/angular-hammer.min.js',
     { pattern: 'dist/angular-hammer.min.js.map', watched: false, included: false },

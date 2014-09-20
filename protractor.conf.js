@@ -5,4 +5,10 @@ exports.config = {
   	showColors: true
   },
   baseUrl: 'http://localhost:8085',
+  capabilities: {
+    browserName: 'chrome',
+    chromeOptions: {
+      args: ['--test-type']
+    }
+  }
 };

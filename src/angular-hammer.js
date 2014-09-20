@@ -4,6 +4,12 @@
 
 var DEBUG_LOGS = false;
 
+/**
+ * Throws error when a condition in not truthy.
+ * @param  {Any}    cond
+ * @param  {String} message
+ * @return {Error|Null}
+ */
 function assert(cond, message) {
   if (!cond) {
     throw new Error(message);
@@ -47,7 +53,10 @@ function isOptimized(d) {
  * Retrives or creates a `Hammer.Manager`.
  * @param  {Object}      scope
  * @param  {HTMLElement} element
- * @return {Object}
+ * @return {Object}      `Hammer.Manager` instance
+ *
+ * @todo `$hammer` should be an object to support methods
+ *                 to retrieve `Hammer.Manager` isntances.
  */
 function hammerManagerFromScope(scope, element) {
   var managers = scope.$hammer || (scope.$hammer = []);
@@ -77,6 +86,12 @@ function recognizerFromDirective(d) {
   return d.slice(prefix.length, d.length - !!optimized);
 }
 
+/**
+ * Parses expression using `$evel`.
+ * @param  {Object} scope
+ * @param  {String} expr
+ * @return {Object}
+ */
 function parseOptionsExpr(scope, expr) {
   return scope.$eval(expr);
 }
@@ -84,7 +99,7 @@ function parseOptionsExpr(scope, expr) {
 /**
  * Retrives options for a given directive (if exists).
  * @param  {Object}  scope
- * @param  {Object}  attr      directive's attributes
+ * @param  {Object}  attr   directive's attributes
  * @param  {String}  d
  * @return {Object}
  */
@@ -93,38 +108,68 @@ function hammerOpts(scope, attr, d) {
   return parseOptionsExpr(scope, attr[optsDirective]) || {};
 }
 
+/**
+ * Checks whether an expression has a `with` keyword.
+ * @param  {String}  expr
+ * @return {Boolean}
+ */
 function hasWithToken(expr) {
   return expr.indexOf(' with ') > -1;
 }
 
+/**
+ * Splits an expression.
+ * @param  {String} expr
+ * @return {Array}
+ */
 function splitExpr(expr) {
+  if (!hasWithToken(expr)) {
+    return [expr.trim()];
+  }
+
   return expr.split(' with ').map(function (expr) {
     return expr.trim();
   });
 }
 
+/**
+ * Retrives directive callback form `attr` object.
+ * @param  {Function} $parse
+ * @param  {Object} scope
+ * @param  {Object} attr
+ * @param  {String} d        directive name
+ * @return {Function}        directive callback
+ */
 function directiveCallback($parse, scope, attr, d) {
-  var splitAttr = [];
-
-  if (hasWithToken(attr[d])) {
-    splitAttr = splitExpr(attr[d]);
-    return $parse(splitAttr[0]);
-  } else {
-    return $parse(attr[d]);
-  }
+  var dirVal = attr[d];
+  return $parse(
+    hasWithToken(dirVal)
+      ? splitExpr(dirVal)[0]
+      : dirVal
+  );
 }
 
+/**
+ * Retrives directives options.
+ * @param  {Object} scope
+ * @param  {Object} attr
+ * @param  {String} d     directive name
+ * @return {Object}       options object passed to HammerJS
+ */
 function directiveOptions(scope, attr, d) {
-  var splitAttr = [];
-
   if (hasWithToken(attr[d])) {
-    splitAttr = splitExpr(attr[d]);
-    return parseOptionsExpr(scope, splitAttr[1]);
+    return parseOptionsExpr(scope, splitExpr(attr[d])[1]);
   } else {
     return hammerOpts(scope, attr, d);
   }
 }
 
+/**
+ * Constructs link function passed to the directive definition.
+ * @param  {Function} $parse
+ * @param  {String}   directive directive name
+ * @return {Function}           link function
+ */
 function constructLinkFn($parse, directive) {
   return function linkFn(scope, element, attr) {
     var callback = directiveCallback($parse, scope, attr, directive);
@@ -155,12 +200,12 @@ function constructLinkFn($parse, directive) {
     $hammer.on(eventName, (function (optimized) {
       if (optimized) {
         return function eventCallbackOptimized(ev) {
-          callback(scope, { hmEvent: ev });
+          callback(scope, { $hmEvent: ev });
         };
       } else {
         return function eventCallbackNotOptimized(ev) {
           scope.$apply(function () {
-            callback(scope, { hmEvent: ev });
+            callback(scope, { $hmEvent: ev });
           });
         };
       }
