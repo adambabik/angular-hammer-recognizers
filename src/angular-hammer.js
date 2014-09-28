@@ -197,20 +197,26 @@ function constructLinkFn($parse, directive) {
     }
 
     var $hammer = hammerManagerFromScope(scope, element[0]);
-    $hammer.add(new Hammer[recognizer](opts));
-    $hammer.on(eventName, (function (optimized) {
-      if (optimized) {
-        return function eventCallbackOptimized(ev) {
+    var fn = isOptimized(directive)
+      ? function eventCallbackOptimized(ev) {
           callback(scope, { $hmEvent: ev });
-        };
-      } else {
-        return function eventCallbackNotOptimized(ev) {
+        }
+      : function eventCallbackNotOptimized(ev) {
           scope.$apply(function () {
             callback(scope, { $hmEvent: ev });
           });
         };
-      }
-    }(isOptimized(directive))));
+
+    // @TODO: firstly, check if a given recognizer already exists.
+    // If so, add just a callback.
+    $hammer.add(new Hammer[recognizer](opts));
+    $hammer.on(eventName, fn);
+
+    scope.$on('$destroy', function () {
+      $hammer.off(eventName, fn);
+
+      // @TODO: destroy `Hammer.Manager` when all callbacks are unbind.
+    });
   };
 }
 
