@@ -15,7 +15,7 @@ module.exports = function(config) {
       'bower_components/angularjs/angular.min.js',
       { pattern: 'bower_components/angularjs/angular.min.js.map', watched: false, included: false },
       'bower_components/angular-mocks/angular-mocks.js',
-      'src/browserTrigger.js',
+      'test/browserTrigger.js',
       'bower_components/hammerjs/hammer.js',
       'dist/angular-hammer.min.js',
       { pattern: 'dist/angular-hammer.min.js.map', watched: false, included: false },
