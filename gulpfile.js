@@ -62,3 +62,9 @@ gulp.task('test-server', function() {
   	port: 8085
   });
 });
+
+gulp.task('test', function () {
+  console.log('');
+  console.log('To run tests write `npm test`.');
+  console.log('');
+});
