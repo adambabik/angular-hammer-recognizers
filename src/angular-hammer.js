@@ -183,14 +183,15 @@ function constructLinkFn($parse, directive) {
     var recognizer = recognizerFromDirective(directive);
     assert(Hammer[recognizer], '`' + recognizer + '` is not supported by Hammer.js.');
 
-    var eventName = recognizer.toLowerCase();
-    opts = angular.extend(opts, { event: eventName });
+    var eventName = opts.event || recognizer.toLowerCase();
+    delete opts.event;
+    opts = angular.extend({ event: eventName }, opts);
 
     if (DEBUG_LOGS) {
       console.log('[ linkFn ]', {
         directive: directive,
         optimized: isOptimized(directive),
-        event: eventName,
+        eventName: eventName,
         opts: opts
       });
     }

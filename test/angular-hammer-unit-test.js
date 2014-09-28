@@ -81,9 +81,14 @@ describe('angular-hammer unit tests ::', function () {
     });
   });
 
-  it('should call `hm-tap` directive callback', function () {
-    el = $compile('<div hm-tap="method()"></div>')(scope);
-    spyOn(scope, 'method');
+  it('should call `hm-tap` directive callback with `$hmEvent` argument', function () {
+    var ev = null;
+    scope.method = function ($hmEvent) {
+      ev = $hmEvent;
+    };
+
+    el = $compile('<div hm-tap="method($hmEvent)"></div>')(scope);
+    spyOn(scope, 'method').and.callThrough();
 
     browserTrigger(el, 'mousedown', {
       keys: [],
@@ -97,7 +102,8 @@ describe('angular-hammer unit tests ::', function () {
       y: 10
     });
 
-    expect(scope.method).toHaveBeenCalled();
+    expect(scope.method).toHaveBeenCalledWith(ev);
+    expect(ev.type).toBe('tap');
   });
 
   it('should call `hm-pan` directive callback and trigger `$digest` cycle', function () {

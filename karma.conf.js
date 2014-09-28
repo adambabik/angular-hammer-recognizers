@@ -19,6 +19,7 @@ module.exports = function(config) {
       'bower_components/hammerjs/hammer.js',
       'dist/angular-hammer.min.js',
       { pattern: 'dist/angular-hammer.min.js.map', watched: false, included: false },
+      // 'src/angular-hammer.js',
       'test/**/*-test.js'
     ],
 

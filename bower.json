@@ -1,11 +1,11 @@
 {
   "name": "angular-hammer",
-  "version": "1.0.0",
+  "version": "1.0.0-beta.1",
   "homepage": "https://github.com/dreame4/angular-hammer",
   "authors": [
     "Adam Babik"
   ],
-  "description": "Hammer.js adapter for AngularJS",
+  "description": "Hammer.JS adapter for AngularJS",
   "main": "dist/angular-hammer.js",
   "keywords": [
     "angular",
@@ -17,7 +17,11 @@
     "node_modules",
     "bower_components",
     "test",
-    "tests"
+    "examples",
+    "gulpfile.js",
+    "karma.conf.js",
+    "package.json",
+    "protractor.conf.js"
   ],
   "dependencies": {
     "angularjs": "~1.2.25",
