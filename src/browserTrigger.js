@@ -13,7 +13,7 @@
    * coordinates, keys, etc...) that are passed into the event when triggered
    */
   window.browserTrigger = function browserTrigger(element, eventType, eventData) {
-    if (element && !element.nodeName) element = element[0];
+    if (element && !element.nodeName && element !== window) element = element[0];
     if (!element) return;
 
     eventData = eventData || {};
@@ -22,7 +22,7 @@
     var y = eventData.y;
 
     var inputType = (element.type) ? element.type.toLowerCase() : null,
-        nodeName = element.nodeName.toLowerCase();
+        nodeName = element.nodeName ? element.nodeName.toLowerCase() : null;
     if (!eventType) {
       eventType = {
         'text':            'change',
@@ -124,7 +124,7 @@
       if(!evnt) return;
 
       var originalPreventDefault = evnt.preventDefault,
-          appWindow = element.ownerDocument.defaultView,
+          appWindow = element.ownerDocument ? element.ownerDocument.defaultView : window,
           fakeProcessDefault = true,
           finalProcessDefault,
           angular = appWindow.angular || {};
