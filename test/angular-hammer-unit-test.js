@@ -1,5 +1,5 @@
-/*global describe: false, it: false, expect: false, beforeEach: false, spyOn: false,
-         angular: false, Hammer: false, jQuery: false, inject: false */
+/*global describe: false, it: false, beforeEach: false, spyOn: false, expect: false,
+inject: false, browserTrigger: false, Hammer: false */
 
 'use strict';
 
