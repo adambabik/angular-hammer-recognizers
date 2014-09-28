@@ -4,6 +4,7 @@
 'use strict';
 
 function getWindowForElement(element) {
+  element && !element.nodeName && (element = element[0]);
   var doc = element.ownerDocument;
   return (doc.defaultView || doc.parentWindow);
 }
@@ -19,8 +20,8 @@ describe('angular-hammer unit tests ::', function () {
   beforeEach(inject(
     ['$compile','$rootScope', function($compile__, $rootScope__) {
       $compile = $compile__;
-      scope = $rootScope__;
-      scope.method = function ($hmEvent) { console.log('==='); };
+      scope = $rootScope__.$new();
+      scope.method = function ($hmEvent) {};
     }]
   ));
 
@@ -80,9 +81,8 @@ describe('angular-hammer unit tests ::', function () {
     });
   });
 
-  it('should call directive callback', function () {
+  it('should call `hm-tap` directive callback', function () {
     el = $compile('<div hm-tap="method()"></div>')(scope);
-
     spyOn(scope, 'method');
 
     browserTrigger(el, 'mousedown', {
@@ -91,12 +91,85 @@ describe('angular-hammer unit tests ::', function () {
       y: 10
     });
 
-    browserTrigger(getWindowForElement(el[0]), 'mouseup', {
+    browserTrigger(getWindowForElement(el), 'mouseup', {
       keys: [],
       x: 10,
       y: 10
     });
 
     expect(scope.method).toHaveBeenCalled();
+  });
+
+  it('should call `hm-pan` directive callback and trigger `$digest` cycle', function () {
+    scope.panned = false;
+    scope.method = function ($hmEvent) {
+      scope.panned = true;
+    };
+
+    el = $compile('<div hm-pan="method()">{{panned}}</div>')(scope);
+    scope.$apply();
+
+    expect(el.text()).toBe('false');
+    spyOn(scope, 'method').and.callThrough();
+
+    browserTrigger(el, 'mousedown', {
+      keys: [],
+      x: 10,
+      y: 10
+    });
+
+    var win = getWindowForElement(el);
+
+    browserTrigger(win, 'mousemove', {
+      keys: [],
+      x: 200,
+      y: 10
+    });
+
+    browserTrigger(win, 'mouseup', {
+      keys: [],
+      x: 200,
+      y: 10
+    });
+
+    expect(scope.method).toHaveBeenCalled();
+    expect(el.text()).toBe('true');
+  });
+
+  it('should call `hm-pan-o` directive callback and DO NOT trigger `$digest` cycle', function () {
+    scope.panned = false;
+    scope.method = function ($hmEvent) {
+      scope.panned = true;
+    };
+
+    el = $compile('<div hm-pan-o="method()">{{panned}}</div>')(scope);
+    scope.$apply();
+
+    expect(el.text()).toBe('false');
+    spyOn(scope, 'method').and.callThrough();
+
+    browserTrigger(el, 'mousedown', {
+      keys: [],
+      x: 10,
+      y: 10
+    });
+
+    var win = getWindowForElement(el);
+
+    browserTrigger(win, 'mousemove', {
+      keys: [],
+      x: 200,
+      y: 10
+    });
+
+    browserTrigger(win, 'mouseup', {
+      keys: [],
+      x: 200,
+      y: 10
+    });
+
+    expect(scope.method).toHaveBeenCalled();
+    expect(el.text()).toBe('false');
+    expect(scope.panned).toBeTruthy();
   });
 });

@@ -245,7 +245,7 @@ RECOGNIZERS.forEach(function (recognizer) {
 
   module.directive(directive, ['$parse', function ($parse) {
     return {
-      restrict: 'AC',
+      restrict: 'A',
       link: constructLinkFn($parse, directive)
     };
   }]);
