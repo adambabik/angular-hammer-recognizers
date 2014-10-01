@@ -2,8 +2,6 @@
 
 'use strict';
 
-var DEBUG_LOGS = false;
-
 /**
  * Throws error when a condition in not truthy.
  * @param  {Any}    cond
@@ -187,15 +185,6 @@ function constructLinkFn($parse, directive) {
     delete opts.event;
     opts = angular.extend({ event: eventName }, opts);
 
-    if (DEBUG_LOGS) {
-      console.log('[ linkFn ]', {
-        directive: directive,
-        optimized: isOptimized(directive),
-        eventName: eventName,
-        opts: opts
-      });
-    }
-
     var $hammer = hammerManagerFromScope(scope, element[0]);
     var fn = isOptimized(directive)
       ? function eventCallbackOptimized(ev) {
@@ -207,15 +196,18 @@ function constructLinkFn($parse, directive) {
           });
         };
 
-    // @TODO: firstly, check if a given recognizer already exists.
-    // If so, add just a callback.
-    $hammer.add(new Hammer[recognizer](opts));
+    // @TODO: it's possible to add multiple recognizers of the same type.
+    var recognizerInstance = new Hammer[recognizer](opts);
+    $hammer.add(recognizerInstance);
     $hammer.on(eventName, fn);
 
     scope.$on('$destroy', function () {
       $hammer.off(eventName, fn);
 
-      // @TODO: destroy `Hammer.Manager` when all callbacks are unbind.
+      var left = Object.keys(recognizerInstance.manager.handlers).length;
+      if (left === 0) {
+        $hammer.destroy();
+      }
     });
   };
 }

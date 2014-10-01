@@ -207,11 +207,18 @@ function constructLinkFn($parse, directive) {
           });
         };
 
-    $hammer.add(new Hammer[recognizer](opts));
+    // @TODO: it's possible to add multiple the same recognizer.
+    // It should be prevented.
+    var recognizerInstance = new Hammer[recognizer](opts);
+    $hammer.add(recognizerInstance);
     $hammer.on(eventName, fn);
+
+    console.log(recognizerInstance.manager.handlers);
 
     scope.$on('$destroy', function () {
       $hammer.off(eventName, fn);
+
+      // @TODO: destroy `Hammer.Manager` when all callbacks are unbind.
     });
   };
 }
