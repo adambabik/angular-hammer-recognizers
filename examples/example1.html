@@ -1,0 +1,40 @@
+<!doctype html>
+<html ng-app="myApp">
+<head>
+  <meta charset="utf-8">
+  <title>angular hammer</title>
+
+  <script src="/bower_components/hammerjs/hammer.js"></script>
+  <script src="/bower_components/angularjs/angular.js"></script>
+  <script src="/dist/angular-hammer.js"></script>
+
+  <script>
+    angular.module('myApp', ['hammer'])
+      .controller('Main', ['$scope', function($scope) {
+        $scope.changeColor = function changeColor($event) {
+          console.log($event);
+        };
+      }]);
+  </script>
+
+  <style>
+    .box {
+      width: 400px;
+      height: 400px;
+      background-color: green;
+      display: inline-block;
+      margin: 10px;
+      padding: 10px;
+    }
+
+    .red {
+      background-color: red;
+    }
+  </style>
+</head>
+<body>
+  <div ng-controller="Main">
+    <div class="box" hm-tap="changeColor(hmEvent) with { taps: 2 }" hm-pan-o="changeColor(hmEvent)">Tap</div>
+  </div>
+</body>
+</html>
