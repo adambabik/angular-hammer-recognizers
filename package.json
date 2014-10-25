@@ -1,27 +1,24 @@
 {
-  "name": "angular-hammer2",
+  "name": "angular-hammer-recognizers",
   "description": "Hammer.JS adapter for AngularJS",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0",
   "author": "Adam Babik",
   "repository": {
     "type": "git",
-    "url": "git://github.com/dreame4/angular-hammer.git"
+    "url": "git://github.com/dreame4/angular-hammer-recognizers.git"
   },
   "bugs": {
-    "url": "http://github.com/dreame4/angular-hammer/issues"
+    "url": "http://github.com/dreame4/angular-hammer-recognizers/issues"
   },
   "licenses": [
     {
       "type": "MIT",
-      "url": "http://github.com/dreame4/angular-hammer/blob/master/LICENSE-MIT"
+      "url": "http://github.com/dreame4/angular-hammer-recognizers/blob/master/LICENSE-MIT"
     }
   ],
   "main": "dist/angular-hammer.js",
   "scripts": {
     "test": "./node_modules/karma/bin/karma start"
-  },
-  "engines": {
-    "node": ">= 0.10"
   },
   "keywords": [
     "hammer",

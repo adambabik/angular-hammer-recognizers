@@ -38,6 +38,16 @@ In some situation you may want to add a gesture recognizer which does not trigge
 
 The following directives are available in an optimized form: `pan`, `pinch`, `rotate`.
 
+## Changelog
+
+### v1.0.1
+
+* Changed lib name to `angular-hammer-recognizers`.
+
+### v1.0.0
+
+* Directives based on HammerJS recognizers.
+
 ## License
 
 MIT
