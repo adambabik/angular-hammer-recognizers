@@ -16,6 +16,20 @@ Using npm:
 
 Or manually, downloading a suitable file from `dist` directory.
 
+Then, place Angular.js, Hammer.js and angular-hammer-recognizers into your HTML:
+
+```html
+<script src="/bower_components/hammerjs/hammer.js"></script>
+<script src="/bower_components/angular/angular.js"></script>
+<script src="/bower_components/angular-hammer-recognizers/dist/angular-hammer.js"></script>
+```
+
+And finally, inject the `hammer` module into your app:
+
+```javascript
+angular.module("app", ["hammer"]);
+```
+
 ## Usage
 
 To add a simple tap gesture recognizer use `hmTap` directive:
